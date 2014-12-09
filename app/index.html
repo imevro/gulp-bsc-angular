@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>gulp</title>
+
+    <!-- build:css({.tmp,app}) /styles/app.css -->
+    <link rel="stylesheet" href="styles/app.css">
+    <!-- endbuild -->
+  </head>
+  <body>
+    <section>
+      <div class="container">
+        <div class="row">
+          <div class="col-xs-12">
+            Hi.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- build:js /scripts/vendor.js -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- endbuild -->
+
+    <!-- build:js(.tmp) /scripts/app.js -->
+    <script src="scripts/app.js"></script>
+    <!-- endbuild -->
+  </body>
+</html>
