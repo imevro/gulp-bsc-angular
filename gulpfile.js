@@ -81,6 +81,18 @@ gulp.task("livereload", function() {
     .pipe($.connect.reload())
 });
 
+gulp.task("livereload-sass", function() {
+  Sequence("sass", "livereload");
+});
+
+gulp.task("livereload-coffee", function() {
+  Sequence("coffee", "livereload");
+});
+
+gulp.task("livereload-images", function() {
+  Sequence("images", "livereload");
+});
+
 // env
 gulp.task("build", function() {
   Sequence("clean", ["sass", "coffee"], ["fonts", "svg", "images"], ["templates", "views"]);
@@ -96,8 +108,8 @@ gulp.task("watch", function() {
     })
 
     gulp.watch(["app/*.html", "app/views/**/*.html"], ["livereload"]);
-    gulp.watch("app/styles/**/*.scss", ["sass", "livereload"]);
-    gulp.watch("app/scripts/**/*.coffee", ["coffee", "livereload"]);
-    gulp.watch("app/images/**/*", ["images", "livereload"]);
+    gulp.watch("app/styles/**/*.scss", ["livereload-sass"]);
+    gulp.watch("app/scripts/**/*.coffee", ["livereload-coffee"]);
+    gulp.watch("app/images/**/*", ["livereload-images"]);
   })
 });
