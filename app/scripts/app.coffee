@@ -1,10 +1,6 @@
-App =
-  generatorName: "gulp-bsc"
-
+class App
   sayHello: (name) ->
     console.info("Hello from #{name}!")
 
-  init: ->
-    @.sayHello(@.generatorName)
-
-App.init()
+app = new App()
+app.sayHello("gulp-bsc")
