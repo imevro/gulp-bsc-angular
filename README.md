@@ -1,6 +1,8 @@
 ## Clone
   
     git clone https://github.com/theaqua/gulp-bsc.git
+    mv gulp-bsc myNewProject
+    cd myNewProject
     rm -rf .git
 
 ## Install
