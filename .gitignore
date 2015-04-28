@@ -1,6 +1,5 @@
-node_modules
-dist
 .tmp
-app/bower_components
-test/bower_components
+dist
+node_modules
+bower_components
 .DS_Store

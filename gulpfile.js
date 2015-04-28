@@ -1,118 +1,114 @@
-"use strict"
+var del         = require('del');
+var args        = require('yargs').argv;
+var sequence    = require('run-sequence');
 
-var gulp = require("gulp"),
-    $ = require("gulp-load-plugins")(),
-    args = require("yargs").argv,
-    Sequence = require("run-sequence"),
-    del = require("del");
+var gulp        = require('gulp');
+var $           = require('gulp-load-plugins')();
+var htmlMinify  = require('gulp-minify-html');
+var ghPages     = require('gulp-gh-pages');
+var connectHistoryFallback = require('connect-history-api-fallback');
 
-var minifyHtml = require("gulp-minify-html");
-
-gulp.task("clean:tmp", function() {
-  return del(".tmp");
+// Clean up
+gulp.task('clean:tmp', function() {
+  return del('.tmp');
 });
 
-gulp.task("clean:dist", function() {
-  return del("dist");
+gulp.task('clean:dist', function() {
+  return del('dist');
 });
 
-// scripts
-gulp.task("coffee", function() {
-  return gulp.src(["app/scripts/**/*.coffee"])
-    .pipe($.changed(".tmp/scripts"))
+// Scripts
+gulp.task('scripts', function() {
+  return gulp.src('app/scripts/**/**.js')
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('jshint-stylish'))
+    .pipe($.if((args.env == 'production'), $.jshint.reporter('fail')))
     .pipe($.sourcemaps.init())
-    .pipe($.coffeelint({
-      max_line_length: { level: "ignore" },
-      no_interpolation_in_single_quotes: { level: "error" }
-    }))
-    .pipe($.coffeelint.reporter())
-    .pipe($.coffee())
-    .pipe($.if((args.env == "production"), $.uglify()))
+    .pipe($.babel())
     .pipe($.sourcemaps.write())
-    .pipe(gulp.dest(".tmp/scripts"));
+    .pipe(gulp.dest('.tmp/scripts'));
 });
 
-// sass
-gulp.task("sass", function() {
-  return gulp.src("app/styles/*.scss")
-    .pipe($.changed(".tmp/styles"))
-    .pipe($.if((args.env == "production"), $.sass({ outputStyle: "compressed" }), $.sass()))
+// Sass
+gulp.task('sass', function() {
+  return gulp.src('app/styles/app.scss')
+    .pipe($.if((args.env == 'production'), $.sass({ outputStyle: 'compressed' }), $.sass())) // compressed for production
     .pipe($.autoprefixer())
-    .pipe(gulp.dest(".tmp/styles"));
+    .pipe(gulp.dest('.tmp/styles'));
 });
 
-// fonts
-gulp.task("fonts", function() {
-  return gulp.src("app/fonts/**/*.*")
-    .pipe(gulp.dest("dist" + "/fonts"));
-});
-
-// images
-gulp.task("svg", function() {
-  return gulp.src("app/images/**/*.svg")
+// Assets like svg
+gulp.task('assets', function() {
+  return gulp.src('app/assets/**/*.svg')
     .pipe($.svgmin())
-    .pipe(gulp.dest("dist/images"));
+    .pipe(gulp.dest('dist/assets'));
 });
 
-gulp.task("images", function() {
-  return gulp.src("app/images/**/*.{jpg,jpeg,png,gif,ico}")
-    .pipe(gulp.dest("dist/images"));
-});
-
-// templates
-gulp.task("templates", function() {
+// Templates
+gulp.task('templates', function() {
   var assets = $.useref.assets();
 
-  return gulp.src("app/*.html")
+  return gulp.src('app/*.html')
     .pipe(assets)
     .pipe($.rev())
     .pipe(assets.restore())
     .pipe($.useref())
     .pipe($.revReplace())
-    .pipe(gulp.dest("dist"));
+    .pipe(htmlMinify({ empty: true }))
+    .pipe(gulp.dest('dist'));
 });
 
-gulp.task("templates:views", function() {
-  return gulp.src("app/views/**/*.html")
-    .pipe(minifyHtml({empty: true}))
-    .pipe(gulp.dest("dist/views"));
+gulp.task('views', function() {
+  return gulp.src('app/views/**/*.html')
+    .pipe(htmlMinify({ empty: true }))
+    .pipe(gulp.dest('dist/views'));
 });
 
-// livereload
-gulp.task("livereload", function() {
-  return gulp.src(["app/*.html", "app/views/**/*.html"])
+// Livereload
+gulp.task('livereload', function() {
+  return gulp.src(['app/*.html', 'app/views/**/*.html'])
     .pipe($.connect.reload());
 });
 
-gulp.task("livereload:sass", function() {
-  Sequence("sass", "livereload");
+gulp.task('livereload:sass', function() {
+  sequence('sass', 'livereload');
 });
 
-gulp.task("livereload:coffee", function() {
-  Sequence("coffee", "livereload");
+gulp.task('livereload:scripts', function() {
+  sequence('scripts', 'livereload');
 });
 
-gulp.task("livereload:images", function() {
-  Sequence("images", "livereload");
+gulp.task('livereload:images', function() {
+  sequence('images', 'livereload');
 });
 
-// env
-gulp.task("build", function() {
-  Sequence("clean:dist", "sass", "coffee", ["fonts", "svg", "images"], ["templates", "templates:views"]);
+// Release
+gulp.task('deploy:ghpages', function() {
+  return gulp.src('dist/**/*')
+    .pipe(ghPages())
+    .pipe(gulp.dest('.'));
 });
 
-// watch
-gulp.task("watch", function() {
-  Sequence("clean:tmp", "sass", "coffee", function() {
+// Build
+gulp.task('build', function() {
+  sequence('clean:dist', 'sass', ['scripts'], ['assets'], ['templates', 'templates:views']);
+});
+
+// Watch
+gulp.task('watch', function() {
+  sequence('clean:tmp', 'sass', ['scripts'], function() {
     $.connect.server({
       livereload: true,
-      root: ["app", ".tmp"],
-      port: 3000
+      root: ['.tmp', 'app', 'bower_components'],
+      port: 3000,
+      middleware: function(connect, opt) {
+        return [connectHistoryFallback()];
+      }
     });
 
-    gulp.watch(["app/*.html", "app/views/**/*.html"], ["livereload"]);
-    gulp.watch("app/styles/**/*.scss", ["livereload:sass"]);
-    gulp.watch("app/scripts/**/*.coffee", ["livereload:coffee"]);
-    gulp.watch("app/images/**/*", ["livereload:images"]);
+    gulp.watch('app/**/*.html', ['livereload']);
+    gulp.watch('app/scripts/**/*.js', ['livereload:scripts']);
+    gulp.watch('app/styles/**/*.scss', ['livereload:sass']);
+    gulp.watch('app/images/**/*', ['livereload:images']);
   })
 });

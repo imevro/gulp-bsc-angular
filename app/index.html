@@ -1,30 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
     <title>gulp</title>
+
+    <base href="/">
+    <meta charset="UTF-8">
 
     <!-- build:css({.tmp,app}) /styles/app.css -->
     <link rel="stylesheet" href="styles/app.css">
     <!-- endbuild -->
   </head>
-  <body>
-    <section>
-      <div class="container">
-        <div class="row">
-          <div class="col-xs-12">
-            <div class="jumbotron">
-              <h1 class="text-center">
-                Hello <span class="text-primary">there</span>.
-              </h1>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <body ng-app="gulpbsc">
+    <section ui-view></section>
 
     <!-- build:js /scripts/vendor.js -->
-    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="angular/angular.min.js"></script>
+    <script src="ui-router/release/angular-ui-router.min.js"></script>
     <!-- endbuild -->
 
     <!-- build:js(.tmp) /scripts/app.js -->
