@@ -54,11 +54,10 @@ gulp.task('templates', function() {
     .pipe(assets.restore())
     .pipe($.useref())
     .pipe($.revReplace())
-    .pipe(htmlMinify({ empty: true }))
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('views', function() {
+gulp.task('templates:views', function() {
   return gulp.src('app/views/**/*.html')
     .pipe(htmlMinify({ empty: true }))
     .pipe(gulp.dest('dist/views'));

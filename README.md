@@ -1,15 +1,13 @@
 ## Clone
   
-    git clone https://github.com/theaqua/gulp-bsc.git
-    mv gulp-bsc myNewProject
+    git clone https://github.com/theaqua/gulp-bsc-angular.git myNewProject
     cd myNewProject
     rm -rf .git
 
 ## Install
 
     npm install -g gulp bower
-    npm install
-    bower install
+    npm install && bower install
 
 ## Run
     

@@ -6,14 +6,14 @@
     <base href="/">
     <meta charset="UTF-8">
 
-    <!-- build:css({.tmp,app}) /styles/app.css -->
+    <!-- build:css(.tmp) /styles/app.css -->
     <link rel="stylesheet" href="styles/app.css">
     <!-- endbuild -->
   </head>
   <body ng-app="gulpbsc">
     <section ui-view></section>
 
-    <!-- build:js /scripts/vendor.js -->
+    <!-- build:js(bower_components) /scripts/vendor.js -->
     <script src="angular/angular.min.js"></script>
     <script src="ui-router/release/angular-ui-router.min.js"></script>
     <!-- endbuild -->
