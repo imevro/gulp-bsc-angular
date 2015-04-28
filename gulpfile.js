@@ -9,6 +9,10 @@ var ghPages     = require('gulp-gh-pages');
 var connectHistoryFallback = require('connect-history-api-fallback');
 
 // Clean up
+gulp.task('clean:publish', function() {
+  return del('.publish');
+});
+
 gulp.task('clean:tmp', function() {
   return del('.tmp');
 });
@@ -81,16 +85,19 @@ gulp.task('livereload:images', function() {
   sequence('images', 'livereload');
 });
 
-// Release
-gulp.task('deploy:ghpages', function() {
-  return gulp.src('dist/**/*')
-    .pipe(ghPages())
-    .pipe(gulp.dest('.'));
-});
-
 // Build
 gulp.task('build', function() {
-  sequence('clean:dist', 'sass', ['scripts'], ['assets'], ['templates', 'templates:views']);
+  sequence('clean:dist', ['sass', 'scripts', 'assets'], ['templates', 'templates:views']);
+});
+
+// Release
+gulp.task('ghpages', function() {
+  return gulp.src('dist/**/*')
+    .pipe(ghPages());
+})
+
+gulp.task('deploy:ghpages', function() {
+  sequence(['clean:publish', 'clean:dist'], ['sass', 'scripts', 'assets'], ['templates', 'templates:views'], 'ghpages');
 });
 
 // Watch
