@@ -102,7 +102,7 @@ gulp.task('deploy:ghpages', function() {
 
 // Watch
 gulp.task('watch', function() {
-  sequence('clean:tmp', 'sass', ['scripts'], function() {
+  sequence('clean:tmp', ['sass', 'scripts'], function() {
     $.connect.server({
       livereload: true,
       root: ['.tmp', 'app', 'bower_components'],
