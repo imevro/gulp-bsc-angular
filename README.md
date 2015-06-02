@@ -1,3 +1,5 @@
+[![devDependency Status](https://david-dm.org/theaqua/gulp-bsc-angular/dev-status.svg)](https://david-dm.org/theaqua/gulp-bsc-angular#info=devDependencies)
+
 ## Clone
   
     git clone https://github.com/theaqua/gulp-bsc-angular.git myNewProject
