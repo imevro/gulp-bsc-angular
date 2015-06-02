@@ -4,8 +4,6 @@ var sequence    = require('run-sequence');
 
 var gulp        = require('gulp');
 var $           = require('gulp-load-plugins')();
-var htmlMinify  = require('gulp-minify-html');
-var ghPages     = require('gulp-gh-pages');
 var connectHistoryFallback = require('connect-history-api-fallback');
 
 // Clean up
@@ -24,7 +22,10 @@ gulp.task('clean:dist', function() {
 // Scripts
 gulp.task('scripts', function() {
   return gulp.src('app/scripts/**/**.js')
+    .pipe($.plumber())
     .pipe($.jshint())
+    .pipe($.jscsWithReporter('.jscsrc'))
+    .pipe($.jscsWithReporter.reporter('console'))
     .pipe($.jshint.reporter('jshint-stylish'))
     .pipe($.if((args.env == 'production'), $.jshint.reporter('fail')))
     .pipe($.sourcemaps.init())
@@ -36,6 +37,7 @@ gulp.task('scripts', function() {
 // Sass
 gulp.task('sass', function() {
   return gulp.src('app/styles/app.scss')
+    .pipe($.plumber())
     .pipe($.if((args.env == 'production'), $.sass({ outputStyle: 'compressed' }), $.sass())) // compressed for production
     .pipe($.autoprefixer())
     .pipe(gulp.dest('.tmp/styles'));
@@ -44,6 +46,7 @@ gulp.task('sass', function() {
 // Assets like svg
 gulp.task('assets', function() {
   return gulp.src('app/assets/**/*.svg')
+    .pipe($.plumber())
     .pipe($.svgmin())
     .pipe(gulp.dest('dist/assets'));
 });
@@ -63,7 +66,7 @@ gulp.task('templates', function() {
 
 gulp.task('templates:views', function() {
   return gulp.src('app/views/**/*.html')
-    .pipe(htmlMinify({ empty: true }))
+    .pipe($.minifyHtml({ empty: true }))
     .pipe(gulp.dest('dist/views'));
 });
 
@@ -93,11 +96,11 @@ gulp.task('build', function() {
 // Release
 gulp.task('ghpages', function() {
   return gulp.src('dist/**/*')
-    .pipe(ghPages());
+    .pipe($.ghPages());
 })
 
 gulp.task('deploy:ghpages', function() {
-  sequence(['clean:publish', 'clean:dist'], ['sass', 'scripts', 'assets'], ['templates', 'templates:views'], 'ghpages');
+  sequence(['clean:tmp', 'clean:publish', 'clean:dist'], ['sass', 'scripts', 'assets'], ['templates', 'templates:views'], 'ghpages');
 });
 
 // Watch
